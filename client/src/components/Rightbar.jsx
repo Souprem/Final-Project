@@ -6,6 +6,7 @@ const Rightbar = () => {
                 <p>This is Buzz.</p>
                 <p>Built as a Final Project.</p>
                 <p>Built by Joel Brook </p>
+                <p>Github Repository: <a href="https://github.com/Souprem/Final-Project" target="_blank" rel="noopener noreferrer" style={{ color: '#1d9bf0', textDecoration: 'none' }}>Link</a></p>
             </div>
         </div>
     );
