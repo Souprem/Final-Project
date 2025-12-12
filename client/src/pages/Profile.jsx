@@ -9,17 +9,22 @@ const Profile = () => {
     const { currentUser, updateUser } = useContext(AuthContext);
     const [userProfile, setUserProfile] = useState(null);
     const [openUpdate, setOpenUpdate] = useState(false);
-    const [editInputs, setEditInputs] = useState({});
+    const [editInputs, setEditInputs] = useState({
+        bio: '',
+        location: '',
+        website: '',
+        file: null
+    });
     const [tweets, setTweets] = useState([]);
 
     useEffect(() => {
-        if (userProfile) {
-            setEditInputs({
-                bio: userProfile.profile?.bio || '',
-                location: userProfile.profile?.location || '',
-                website: userProfile.profile?.website || '',
-                // profilePic is handled by file input, no need to set string here
-            });
+        if (userProfile && userProfile.profile) {
+            setEditInputs(prev => ({
+                ...prev,
+                bio: userProfile.profile.bio || '',
+                location: userProfile.profile.location || '',
+                website: userProfile.profile.website || ''
+            }));
         }
     }, [userProfile]);
 
@@ -35,21 +40,13 @@ const Profile = () => {
 
         try {
             const res = await api.put(`/users/${currentUser._id}`, formData);
-            console.log("Update response:", res.data); // Log the response
+            console.log("Update response:", res.data);
+            alert("Profile updated successfully!"); // Feedback for user
             setOpenUpdate(false);
 
             // Sync context
             updateUser(res.data);
 
-            // Refresh local state if needed (though res.data should be the new user object)
-            // But we might want to refetch everything or just update parent.
-            // Actually, we should refetch profile data or rely on router reload?
-            // Let's just update context. And maybe force a reload or rely on react reactivity.
-            // Since Profile page uses `user` state which is fetched on mount, we might need to update that too.
-            // But the Navbar uses context which relies on updateUser.
-
-            // Re-fetch profile data to be sure
-            // If the current profile being viewed is the currentUser's profile, update userProfile state
             if (id === currentUser._id) {
                 const updatedUserRes = await api.get(`/users/${id}`);
                 setUserProfile(updatedUserRes.data);
@@ -57,6 +54,7 @@ const Profile = () => {
 
         } catch (err) {
             console.error(err);
+            alert(`Update Failed: ${err.message}`); // Visible error for debugging
         }
     };
 
