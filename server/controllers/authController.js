@@ -36,6 +36,8 @@ exports.login = async (req, res) => {
 
         res.cookie('access_token', token, {
             httpOnly: true,
+            secure: true, // Required for SameSite=None
+            sameSite: 'none' // Required for cross-site cookie
         }).status(200).json({ ...otherDetails });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -43,5 +45,8 @@ exports.login = async (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    res.clearCookie("access_token").status(200).json({ message: "Logged out successfully" });
+    res.clearCookie("access_token", {
+        sameSite: 'none',
+        secure: true
+    }).status(200).json({ message: "Logged out successfully" });
 };
