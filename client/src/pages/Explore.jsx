@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 import TweetCard from '../components/TweetCard';
 
+// --- MOCK DATA FOR DEMO STABILITY ---
+
 const Explore = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);

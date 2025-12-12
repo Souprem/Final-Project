@@ -39,9 +39,10 @@ exports.updateUser = async (req, res) => {
             let updateData = { ...req.body };
 
             if (req.file) {
-                const protocol = req.protocol;
-                const host = req.get('host');
-                updateData.profilePic = `${protocol}://${host}/uploads/${req.file.filename}`;
+                // Convert buffer to Base64 string
+                const b64 = Buffer.from(req.file.buffer).toString('base64');
+                const mimeType = req.file.mimetype;
+                updateData.profilePic = `data:${mimeType};base64,${b64}`;
             }
 
             const profileUpdates = {};
