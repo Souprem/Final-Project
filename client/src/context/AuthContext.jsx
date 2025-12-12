@@ -18,7 +18,18 @@ export const AuthContextProvider = ({ children }) => {
         // We are using proxy in package.json or manually setting url
         // Since we are using Vite, we need proper CORS or full URL. Let's use full URL for now to be safe or set axios global.
         const res = await api.post('/auth/login', inputs);
-        setCurrentUser(res.data);
+
+        // Extract token from response (backend must send it in JSON body now)
+        // Wait, authController currently sends it in cookie AND maybe body? 
+        // Let's assume we will update backend to send it in body if not already.
+        // Actually, previous view of authController showed: .json({ ...otherDetails }) which explicitly EXCLUDED password but included nothing else?
+        // Wait, line 34: const token = ...; line 39: .json({ ...otherDetails }). 
+        // It DOES NOT send token in body. I need to update Backend first or concurrently.
+        // I'll update backend to send it.
+        const { token, ...userData } = res.data;
+
+        localStorage.setItem('access_token', token); // Save token separately
+        setCurrentUser(userData);
     };
 
     const register = async (inputs) => {
@@ -27,6 +38,7 @@ export const AuthContextProvider = ({ children }) => {
 
     const logout = async () => {
         await api.post('/auth/logout');
+        localStorage.removeItem('access_token'); // Clear token
         setCurrentUser(null);
     };
 

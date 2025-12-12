@@ -38,7 +38,7 @@ exports.login = async (req, res) => {
             httpOnly: true,
             secure: true, // Required for SameSite=None
             sameSite: 'none' // Required for cross-site cookie
-        }).status(200).json({ ...otherDetails });
+        }).status(200).json({ token, ...otherDetails }); // Send token in body too!
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
