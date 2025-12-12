@@ -16,12 +16,13 @@ const Explore = () => {
         e.preventDefault();
         try {
             const [newsRes, tweetsRes] = await Promise.allSettled([
-                axios.get(`https://newsapi.org/v2/everything?q=${query}&apiKey=${API_KEY}`),
+                // Limit to 10 results to save credits (default is higher)
+                axios.get(`https://newsdata.io/api/1/news?apikey=${API_KEY}&q=${query}&size=10`),
                 api.get(`/tweets/search?q=${query}`)
             ]);
 
             if (newsRes.status === 'fulfilled') {
-                setResults(newsRes.value.data.articles);
+                setResults(newsRes.value.data.results);
             } else {
                 console.log("NewsAPI Error:", newsRes.reason);
             }
@@ -64,18 +65,21 @@ const Explore = () => {
                 {(results.length > 0 || tweetResults.length > 0) && <h3 style={{ marginBottom: '15px' }}>News Results</h3>}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
                     {results.map((article, index) => (
-                        <Link key={index} to={`/details/${encodeURIComponent(article.url)}`} state={{ article }} style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Link key={index} to={`/details/${encodeURIComponent(article.link)}`} state={{ article }} style={{ textDecoration: 'none', color: 'inherit' }}>
                             <div style={{ border: '1px solid #333', borderRadius: '10px', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                                {article.urlToImage && (
+                                {article.image_url && (
                                     <img
-                                        src={article.urlToImage}
+                                        src={article.image_url}
                                         alt={article.title}
                                         style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+                                        onError={(e) => e.target.style.display = 'none'}
                                     />
                                 )}
                                 <div style={{ padding: '10px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                                     <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', lineHeight: '1.4' }}>{article.title}</h4>
-                                    <span style={{ fontSize: '12px', color: 'gray', marginTop: 'auto' }}>{article.source.name}</span>
+                                    <span style={{ fontSize: '12px', color: 'gray', marginTop: 'auto' }}>
+                                        {article.source_id || "News"}
+                                    </span>
                                 </div>
                             </div>
                         </Link>
