@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import api from '../api';
 
 const Register = () => {
+    // --- STATE ---
     const [inputs, setInputs] = useState({
         username: '',
         email: '',
@@ -19,6 +20,7 @@ const Register = () => {
         setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
+    // --- HANDLERS ---
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
@@ -29,6 +31,7 @@ const Register = () => {
         }
     };
 
+    // --- RENDER ---
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', gap: '20px' }}>
             <h1>Join Buzz</h1>

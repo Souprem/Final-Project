@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
+    // --- HOOKS & STATE ---
     const [inputs, setInputs] = useState({
         username: '',
         password: '',
@@ -16,6 +17,7 @@ const Login = () => {
         setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
+    // --- HANDLERS ---
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
@@ -26,6 +28,7 @@ const Login = () => {
         }
     };
 
+    // --- RENDER ---
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', gap: '20px' }}>
             <h1>Login to Buzz</h1>

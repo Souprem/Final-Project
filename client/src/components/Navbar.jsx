@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-// Restoring ONLY the icons that were present in the stable version to prevent crashes
 import { AiOutlineSearch, AiOutlineUser } from 'react-icons/ai';
 import { BiLogOut, BiHome } from 'react-icons/bi';
 
@@ -11,6 +10,7 @@ const Navbar = () => {
 
     const isActive = (path) => location.pathname === path;
 
+    // --- RENDER ---
     return (
         <div className="sidebar">
             <div className="top">

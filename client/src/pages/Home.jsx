@@ -6,17 +6,17 @@ import TweetCard from '../components/TweetCard';
 import Share from '../components/Share';
 
 const Home = () => {
+    // --- HOOKS & STATE ---
     const [tweets, setTweets] = useState([]);
     const [feedType, setFeedType] = useState('all'); // 'all' or 'following'
     const { currentUser } = useContext(AuthContext);
 
     useEffect(() => {
+        // --- DATA FETCHING ---
         const fetchTweets = async () => {
             try {
-                // Determine endpoint based on feed type
                 const endpoint = feedType === 'following' ? '/tweets/timeline' : '/tweets/all';
 
-                // If following feed is selected but user is logged out, switch back to all
                 if (feedType === 'following' && !currentUser) {
                     setFeedType('all');
                     return;
@@ -27,12 +27,11 @@ const Home = () => {
                     setTweets(res.data);
                 } else {
                     console.error("API Error: Expected array but got:", res.data);
-                    setTweets([]); // Fallback to avoid crash
+                    setTweets([]);
                 }
             } catch (err) {
                 console.log(err);
                 if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                    // Fallback to public feed on auth error
                     setFeedType('all');
                 }
             }
@@ -40,7 +39,7 @@ const Home = () => {
         fetchTweets();
     }, [currentUser, feedType]);
 
-    // Function to handle switching to Following tab
+    // --- EVENT HANDLERS ---
     const handleFollowingClick = () => {
         if (!currentUser) {
             alert("Please login to view your following feed.");
@@ -49,6 +48,7 @@ const Home = () => {
         setFeedType('following');
     };
 
+    // --- MAIN RENDER ---
     return (
         <div style={{ padding: '20px' }}>
             <div style={{ display: 'flex', borderBottom: '1px solid #333', marginBottom: '20px' }}>

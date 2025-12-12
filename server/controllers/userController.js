@@ -7,7 +7,6 @@ exports.getUser = async (req, res) => {
         const user = await User.findById(req.params.id);
         const { password, ...otherDetails } = user._doc;
 
-        // Conditional privacy check
         let isOwner = false;
         const token = req.cookies.access_token;
         if (token) {
@@ -19,9 +18,8 @@ exports.getUser = async (req, res) => {
         }
 
         if (isOwner) {
-            res.status(200).json(otherDetails); // Includes name, email
+            res.status(200).json(otherDetails);
         } else {
-            // Exclude private info for public view
             const { name, email, ...publicDetails } = otherDetails;
             res.status(200).json(publicDetails);
         }

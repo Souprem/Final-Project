@@ -7,6 +7,8 @@ import TweetCard from '../components/TweetCard';
 const Profile = () => {
     const { id } = useParams();
     const { currentUser, updateUser } = useContext(AuthContext);
+
+    // --- STATE ---
     const [userProfile, setUserProfile] = useState(null);
     const [openUpdate, setOpenUpdate] = useState(false);
     const [editInputs, setEditInputs] = useState({
@@ -28,6 +30,7 @@ const Profile = () => {
         }
     }, [userProfile]);
 
+    // --- HANDLERS ---
     const handleUpdate = async (e) => {
         e.preventDefault();
         const formData = new FormData();
@@ -71,19 +74,6 @@ const Profile = () => {
             try {
                 const userRes = await api.get(`/users/${id}`);
                 setUserProfile(userRes.data);
-
-                // Assuming we have an endpoint for user-specific tweets. 
-                // I implemented getAllTweets and getTimeline. 
-                // I did NOT implement getUserTweets in Tweet Controller! 
-                // Uh oh. I need to fix that or filter on client (bad).
-                // Actually, getTimeline gets current user + friends.
-                // I need `GET /api/tweets/user/:userId`.
-                // For now, I will use `getAllTweets` and filter in frontend for simplicity (Project 1, "easiest").
-                // OR I can quickly add the endpoint.
-                // Let's filter on frontend for now to save tool calls, as I have limited time?
-                // "easiest project".
-                // Actually adding endpoint is cleaner. Ideally I should have spotted this.
-                // I'll filter client side for now.
                 const tweetsRes = await api.get('/tweets/all');
                 setTweets(tweetsRes.data.filter(t => t.author._id === id || t.author === id));
             } catch (err) {

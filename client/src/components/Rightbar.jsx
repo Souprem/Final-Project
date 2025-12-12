@@ -1,4 +1,5 @@
 const Rightbar = () => {
+    // --- RENDER ---
     return (
         <div className="right-sidebar">
             <div style={{ backgroundColor: '#16181c', borderRadius: '15px', padding: '15px' }}>

@@ -12,8 +12,6 @@ const Details = () => {
     const [content, setContent] = useState('');
     const { currentUser } = useContext(AuthContext);
 
-    // If direct link (no state), we could fetch or just show discussion.
-    // For MVP, we assume navigation from Search or just show comments for this ID (url).
 
     useEffect(() => {
         // Fetch Local Tweets about this Article
