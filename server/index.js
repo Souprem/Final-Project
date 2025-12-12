@@ -11,6 +11,10 @@ const tweetRoutes = require('./routes/tweetRoutes');
 const app = express();
 dotenv.config();
 
+// Trust the proxy (Render/Vercel) to forward the protocol correctly
+// This is REQUIRED for secure cookies to work behind a load balancer
+app.set('trust proxy', 1);
+
 const connect = () => {
     mongoose
         .connect(process.env.MONGO_URI)
