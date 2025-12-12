@@ -24,10 +24,11 @@ const Explore = () => {
                 console.log("NewsAPI Error:", newsRes.reason);
             }
 
-            if (tweetsRes.status === 'fulfilled') {
+            if (tweetsRes.status === 'fulfilled' && Array.isArray(tweetsRes.value.data)) {
                 setTweetResults(tweetsRes.value.data);
             } else {
-                console.log("Tweet Search Error:", tweetsRes.reason);
+                console.log("Tweet Search Error or Invalid Data:", tweetsRes);
+                setTweetResults([]);
             }
 
         } catch (err) {

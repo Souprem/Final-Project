@@ -23,7 +23,12 @@ const Home = () => {
                 }
 
                 const res = await api.get(endpoint);
-                setTweets(res.data);
+                if (Array.isArray(res.data)) {
+                    setTweets(res.data);
+                } else {
+                    console.error("API Error: Expected array but got:", res.data);
+                    setTweets([]); // Fallback to avoid crash
+                }
             } catch (err) {
                 console.log(err);
                 if (err.response && (err.response.status === 401 || err.response.status === 403)) {
