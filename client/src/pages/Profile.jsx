@@ -12,16 +12,16 @@ const Profile = () => {
     const [editInputs, setEditInputs] = useState({});
     const [tweets, setTweets] = useState([]);
 
-    // useEffect(() => {
-    //     if (userProfile) {
-    //         setEditInputs({
-    //             bio: userProfile.profile?.bio || '',
-    //             location: userProfile.profile?.location || '',
-    //             website: userProfile.profile?.website || '',
-    //             profilePic: userProfile.profilePic || '',
-    //         });
-    //     }
-    // }, [userProfile]);
+    useEffect(() => {
+        if (userProfile) {
+            setEditInputs({
+                bio: userProfile.profile?.bio || '',
+                location: userProfile.profile?.location || '',
+                website: userProfile.profile?.website || '',
+                // profilePic is handled by file input, no need to set string here
+            });
+        }
+    }, [userProfile]);
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -34,11 +34,7 @@ const Profile = () => {
         }
 
         try {
-            const res = await api.put(`/users/${currentUser._id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const res = await api.put(`/users/${currentUser._id}`, formData);
             console.log("Update response:", res.data); // Log the response
             setOpenUpdate(false);
 
