@@ -2,10 +2,24 @@ const Tweet = require('../models/Tweet');
 const User = require('../models/User');
 
 exports.createTweet = async (req, res) => {
-    const newTweet = new Tweet({ ...req.body, author: req.user.id });
+    const { content, mediaId, mediaUrl, parent } = req.body;
+    const newTweet = new Tweet({
+        content, mediaId, mediaUrl, parent,
+        author: req.user.id
+    });
     try {
         const savedTweet = await newTweet.save();
         res.status(200).json(savedTweet);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.getTweet = async (req, res) => {
+    try {
+        const tweet = await Tweet.findById(req.params.id).populate('author', 'username profile profilePic');
+        const replies = await Tweet.find({ parent: req.params.id }).populate('author', 'username profile profilePic').sort({ createdAt: -1 });
+        res.status(200).json({ ...tweet._doc, replies });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -42,7 +56,7 @@ exports.likeTweet = async (req, res) => {
 
 exports.getAllTweets = async (req, res) => {
     try {
-        const tweets = await Tweet.find().sort({ createdAt: -1 }).populate('author', 'username profile');
+        const tweets = await Tweet.find({ parent: null }).sort({ createdAt: -1 }).populate('author', 'username profile profilePic');
         res.status(200).json(tweets);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -52,10 +66,11 @@ exports.getAllTweets = async (req, res) => {
 exports.getTimeline = async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.id);
-        const userTweets = await Tweet.find({ author: currentUser._id }).populate('author', 'username profile');
+        const userTweets = await Tweet.find({ author: currentUser._id, parent: null }).populate('author', 'username profile profilePic');
         const friendTweets = await Tweet.find({
             author: { $in: currentUser.following },
-        }).populate('author', 'username profile');
+            parent: null
+        }).populate('author', 'username profile profilePic');
 
         // Combine and sort
         const timeline = userTweets.concat(friendTweets).sort((a, b) => b.createdAt - a.createdAt);
@@ -65,9 +80,21 @@ exports.getTimeline = async (req, res) => {
     }
 };
 
+exports.searchTweets = async (req, res) => {
+    const query = req.query.q;
+    try {
+        const tweets = await Tweet.find({
+            content: { $regex: query, $options: "i" },
+        }).sort({ createdAt: -1 }).populate('author', 'username profile profilePic');
+        res.status(200).json(tweets);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 exports.getTweetsByMedia = async (req, res) => {
     try {
-        const tweets = await Tweet.find({ mediaId: req.params.mediaId }).sort({ createdAt: -1 }).populate('author', 'username profile');
+        const tweets = await Tweet.find({ mediaId: req.params.mediaId }).sort({ createdAt: -1 }).populate('author', 'username profile profilePic');
         res.status(200).json(tweets);
     } catch (err) {
         res.status(500).json({ error: err.message });

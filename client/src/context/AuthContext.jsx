@@ -4,7 +4,15 @@ import api from '../api';
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
+    const [currentUser, setCurrentUser] = useState(() => {
+        try {
+            const storedUser = localStorage.getItem('user');
+            return storedUser ? JSON.parse(storedUser) : null;
+        } catch (err) {
+            console.error("Failed to parse user from local storage", err);
+            return null;
+        }
+    });
 
     const login = async (inputs) => {
         // We are using proxy in package.json or manually setting url
@@ -22,12 +30,31 @@ export const AuthContextProvider = ({ children }) => {
         setCurrentUser(null);
     };
 
+    const updateUser = (data) => {
+        setCurrentUser(data);
+    };
+
     useEffect(() => {
         localStorage.setItem('user', JSON.stringify(currentUser));
     }, [currentUser]);
 
+    useEffect(() => {
+        const refreshUser = async () => {
+            if (currentUser?._id) {
+                try {
+                    const res = await api.get(`/users/${currentUser._id}`);
+                    setCurrentUser(res.data);
+                } catch (err) {
+                    console.log("Failed to refresh user:", err);
+                    // Optional: logout if user not found (404)
+                }
+            }
+        };
+        refreshUser();
+    }, []); // Run once on mount
+
     return (
-        <AuthContext.Provider value={{ currentUser, login, register, logout }}>
+        <AuthContext.Provider value={{ currentUser, login, register, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

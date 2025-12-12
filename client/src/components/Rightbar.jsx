@@ -5,8 +5,7 @@ const Rightbar = () => {
                 <h3>What's happening</h3>
                 <p>This is Buzz.</p>
                 <p>Built as a Final Project.</p>
-                <p>#MERNStack</p>
-                <p>#WebDev</p>
+                <p>Built by Joel Brook </p>
             </div>
         </div>
     );

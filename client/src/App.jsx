@@ -7,6 +7,8 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Explore from './pages/Explore';
 import Details from './pages/Details';
+import TweetDetails from './pages/TweetDetails';
+import Privacy from './pages/Privacy';
 import Navbar from './components/Navbar';
 import Rightbar from './components/Rightbar';
 import './index.css';
@@ -36,16 +38,27 @@ const ProtectedRoute = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      <ProtectedRoute>
-        <Layout />
-      </ProtectedRoute>
-    ),
+    element: <Layout />,
     children: [
-      { path: '/', element: <Home /> },
-      { path: '/profile/:id', element: <Profile /> },
-      { path: '/explore', element: <Explore /> },
+      {
+        path: '/',
+        element: <Home />
+      },
+      {
+        path: '/profile/:id',
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/tweet/:id',
+        element: <TweetDetails />
+      },
+      { path: '/search', element: <Explore /> },
       { path: '/details/:mediaId', element: <Details /> },
+      { path: '/privacy', element: <Privacy /> },
     ],
   },
   {

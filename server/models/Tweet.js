@@ -5,7 +5,8 @@ const tweetSchema = new mongoose.Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     mediaId: { type: String, default: null }, // Giphy ID
     mediaUrl: { type: String, default: null },
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Tweet', default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Tweet', tweetSchema);

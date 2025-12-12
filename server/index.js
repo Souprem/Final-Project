@@ -26,17 +26,19 @@ const connect = () => {
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
-    origin: ["http://localhost:5173", "https://buzz-app.vercel.app"], // Add your Vercel domain here later or use wildcard if not using credentials
+    origin: true, // Allow all origins for easier initial deployment
     credentials: true
 }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tweets', tweetRoutes);
+app.use('/uploads', express.static('uploads'));
 
 app.use((err, req, res, next) => {
     const status = err.status || 500;
     const message = err.message || 'Something went wrong!';
+    console.error("Global Error Handler detected:", err);
     return res.status(status).json({
         success: false,
         status,

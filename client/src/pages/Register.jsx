@@ -6,6 +6,8 @@ import api from '../api';
 const Register = () => {
     const [inputs, setInputs] = useState({
         username: '',
+        email: '',
+        name: '',
         password: '',
         role: 'member', // default
     });
@@ -31,8 +33,10 @@ const Register = () => {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', gap: '20px' }}>
             <h1>Join Buzz</h1>
             <form style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '300px' }}>
-                <input className="form-input" type="text" placeholder="Username" name="username" onChange={handleChange} />
-                <input className="form-input" type="password" placeholder="Password" name="password" onChange={handleChange} />
+                <input type="text" placeholder="Username" name="username" onChange={handleChange} className="form-input" />
+                <input type="email" placeholder="Email" name="email" onChange={handleChange} className="form-input" />
+                <input type="text" placeholder="Name" name="name" onChange={handleChange} className="form-input" />
+                <input type="password" placeholder="Password" name="password" onChange={handleChange} className="form-input" />
                 <select className="form-input" name="role" onChange={handleChange}>
                     <option value="member">Member</option>
                     <option value="moderator">Moderator</option>
@@ -40,7 +44,7 @@ const Register = () => {
                 <button className="btn" onClick={handleRegister}>Register</button>
                 {err && <p style={{ color: 'red' }}>{err}</p>}
                 <span style={{ color: 'gray' }}>
-                    Have an account? <Link to="/login">Login</Link>
+                    Have an account? <Link to="/login">Login</Link>. <Link to="/privacy">Privacy Policy</Link>.
                 </span>
             </form>
         </div>

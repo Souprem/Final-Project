@@ -1,0 +1,85 @@
+<mxfile host="app.diagrams.net" modified="2023-10-27T00:00:00.000Z" agent="5.0 (Macintosh)" etag="uml-diagram" version="21.0.0" type="device">
+  <diagram id="class-diagram" name="Page-1">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- User Class -->
+        <mxCell id="User" value="User" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="360" y="80" width="160" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="UserMethod" value="+_id: String&lt;br&gt;+username: String&lt;br&gt;+email: String&lt;br&gt;+password: String&lt;br&gt;+role: String&lt;br&gt;+profilePic: String&lt;br&gt;+register()&lt;br&gt;+login()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;simp;overflow=hidden;" vertex="1" parent="User">
+          <mxGeometry y="26" width="160" height="164" as="geometry" />
+        </mxCell>
+
+        <!-- Moderator Class -->
+        <mxCell id="Moderator" value="Moderator" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+            <mxGeometry x="120" y="80" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="ModMethod" value="+assignedSections: []&lt;br&gt;+adminLevel: Number&lt;br&gt;+banUser()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;simp;overflow=hidden;" vertex="1" parent="Moderator">
+            <mxGeometry y="26" width="160" height="74" as="geometry" />
+        </mxCell>
+
+        <!-- Profile Class -->
+        <mxCell id="Profile" value="Profile" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+            <mxGeometry x="600" y="80" width="160" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ProfileMethod" value="+bio: String&lt;br&gt;+location: String&lt;br&gt;+website: String" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;simp;overflow=hidden;" vertex="1" parent="Profile">
+            <mxGeometry y="26" width="160" height="64" as="geometry" />
+        </mxCell>
+
+         <!-- Tweet Class -->
+         <mxCell id="Tweet" value="Tweet" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+            <mxGeometry x="360" y="360" width="160" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="TweetMethod" value="+_id: String&lt;br&gt;+content: String&lt;br&gt;+mediaId: String&lt;br&gt;+createdAt: Date&lt;br&gt;+likes: User[]&lt;br&gt;+like()&lt;br&gt;+reply()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;simp;overflow=hidden;" vertex="1" parent="Tweet">
+            <mxGeometry y="26" width="160" height="124" as="geometry" />
+        </mxCell>
+
+        <!-- Media Class -->
+        <mxCell id="Media" value="Media" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+            <mxGeometry x="600" y="400" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="MediaMethod" value="+type: String&lt;br&gt;+url: String" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;simp;overflow=hidden;" vertex="1" parent="Media">
+            <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+
+        <!-- Relationships -->
+        
+        <!-- Moderator extends User (Generalization) -->
+        <mxCell id="Rel1" value="Extends" style="endArrow=block;html=1;endSize=12;endFill=0;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="Moderator" target="User">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="280" y="150" as="sourcePoint" />
+            <mxPoint x="360" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User has Profile (Composition) -->
+        <mxCell id="Rel2" value="Has" style="endArrow=diamondThin;endFill=1;endSize=14;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="User" target="Profile">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="520" y="150" as="sourcePoint" />
+            <mxPoint x="600" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User Authors Tweet (Association) -->
+        <mxCell id="Rel3" value="Authors" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="User" target="Tweet">
+          <mxGeometry x="-1" y="3" relative="1" as="geometry">
+            <mxPoint x="440" y="270" as="sourcePoint" />
+            <mxPoint x="440" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Tweet contains Media (Association) -->
+        <mxCell id="Rel4" value="Contains" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="Tweet" target="Media">
+          <mxGeometry x="-1" y="3" relative="1" as="geometry">
+            <mxPoint x="520" y="440" as="sourcePoint" />
+            <mxPoint x="600" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

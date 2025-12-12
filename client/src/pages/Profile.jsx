@@ -6,9 +6,71 @@ import TweetCard from '../components/TweetCard';
 
 const Profile = () => {
     const { id } = useParams();
-    const { currentUser } = useContext(AuthContext);
+    const { currentUser, updateUser } = useContext(AuthContext);
     const [userProfile, setUserProfile] = useState(null);
+    const [openUpdate, setOpenUpdate] = useState(false);
+    const [editInputs, setEditInputs] = useState({});
     const [tweets, setTweets] = useState([]);
+
+    // useEffect(() => {
+    //     if (userProfile) {
+    //         setEditInputs({
+    //             bio: userProfile.profile?.bio || '',
+    //             location: userProfile.profile?.location || '',
+    //             website: userProfile.profile?.website || '',
+    //             profilePic: userProfile.profilePic || '',
+    //         });
+    //     }
+    // }, [userProfile]);
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('bio', editInputs.bio);
+        formData.append('location', editInputs.location);
+        formData.append('website', editInputs.website);
+        if (editInputs.file) {
+            formData.append('profilePic', editInputs.file);
+        }
+
+        try {
+            const res = await api.put(`/users/${currentUser._id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            console.log("Update response:", res.data); // Log the response
+            setOpenUpdate(false);
+
+            // Sync context
+            updateUser(res.data);
+
+            // Refresh local state if needed (though res.data should be the new user object)
+            // But we might want to refetch everything or just update parent.
+            // Actually, we should refetch profile data or rely on router reload?
+            // Let's just update context. And maybe force a reload or rely on react reactivity.
+            // Since Profile page uses `user` state which is fetched on mount, we might need to update that too.
+            // But the Navbar uses context which relies on updateUser.
+
+            // Re-fetch profile data to be sure
+            // If the current profile being viewed is the currentUser's profile, update userProfile state
+            if (id === currentUser._id) {
+                const updatedUserRes = await api.get(`/users/${id}`);
+                setUserProfile(updatedUserRes.data);
+            }
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleChange = (e) => {
+        if (e.target.name === 'file') {
+            setEditInputs(prev => ({ ...prev, file: e.target.files[0] }));
+        } else {
+            setEditInputs(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -55,11 +117,11 @@ const Profile = () => {
             </div>
             <div style={{ padding: '0 20px', position: 'relative' }}>
                 <div style={{ width: '130px', height: '130px', borderRadius: '50%', backgroundColor: 'black', position: 'absolute', top: '-65px', padding: '5px' }}>
-                    <div style={{ width: '100%', height: '100%', borderRadius: '50%', backgroundColor: '#555' }}></div>
+                    <img src={userProfile.profilePic || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '10px' }}>
                     {currentUser._id === id ? (
-                        <button className="btn btn-secondary">Edit Profile</button>
+                        <button className="btn btn-secondary" onClick={() => setOpenUpdate(true)}>Edit Profile</button>
                     ) : (
                         <button className="btn" onClick={handleFollow}>
                             {currentUser.following?.includes(id) ? 'Unfollow' : 'Follow'}
@@ -70,10 +132,22 @@ const Profile = () => {
                     <h2>{userProfile.username}</h2>
                     <p style={{ color: 'gray' }}>@{userProfile.username}</p>
                     <p>{userProfile.profile?.bio || "No bio yet."}</p>
+                    <div style={{ display: 'flex', gap: '15px', margin: '10px 0', color: 'gray', fontSize: '14px' }}>
+                        {userProfile.profile?.location && <span>📍 {userProfile.profile.location}</span>}
+                        {userProfile.profile?.website && <span>🔗 <a href={userProfile.profile.website} target="_blank" rel="noopener noreferrer" style={{ color: '#1d9bf0' }}>{userProfile.profile.website}</a></span>}
+                    </div>
                     <div style={{ display: 'flex', gap: '20px', color: 'gray' }}>
                         <span><b>{userProfile.following?.length || 0}</b> Following</span>
                         <span><b>{userProfile.followers?.length || 0}</b> Followers</span>
                     </div>
+                    {/* Private Info Section */}
+                    {(userProfile.email || userProfile.name) && (
+                        <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#111', borderRadius: '10px' }}>
+                            <h4 style={{ margin: '0 0 5px 0' }}>Personal Info (Private)</h4>
+                            {userProfile.name && <p style={{ margin: '5px 0', fontSize: '14px' }}>Name: {userProfile.name}</p>}
+                            {userProfile.email && <p style={{ margin: '5px 0', fontSize: '14px' }}>Email: {userProfile.email}</p>}
+                        </div>
+                    )}
                 </div>
             </div>
             <div style={{ borderBottom: '1px solid var(--border-color)', marginTop: '20px' }}></div>
@@ -82,6 +156,25 @@ const Profile = () => {
                     <TweetCard key={tweet._id} tweet={tweet} setTweets={setTweets} />
                 ))}
             </div>
+            {openUpdate && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999
+                }}>
+                    <div style={{ backgroundColor: 'black', padding: '20px', borderRadius: '10px', width: '300px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <label>Profile Picture</label>
+                        <input className="form-input" type="file" name="file" onChange={handleChange} />
+                        <label>Bio</label>
+                        <input className="form-input" name="bio" value={editInputs.bio} onChange={handleChange} />
+                        <label>Location</label>
+                        <input className="form-input" name="location" value={editInputs.location} onChange={handleChange} />
+                        <label>Website</label>
+                        <input className="form-input" name="website" value={editInputs.website} onChange={handleChange} />
+                        <button className="btn" onClick={handleUpdate}>Save</button>
+                        <button className="btn btn-secondary" onClick={() => setOpenUpdate(false)}>Cancel</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

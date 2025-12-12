@@ -1,52 +1,40 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import api from '../api';
 import { AuthContext } from '../context/AuthContext';
 import TweetCard from '../components/TweetCard';
 
 const Details = () => {
     const { mediaId } = useParams();
-    const { state } = useLocation(); // Get gif from invalidation if avail
-    const [gif, setGif] = useState(state?.gif || null);
+    const { state } = useLocation();
+    const [article, setArticle] = useState(state?.article || null);
     const [tweets, setTweets] = useState([]);
     const [content, setContent] = useState('');
     const { currentUser } = useContext(AuthContext);
 
-    const API_KEY = import.meta.env.VITE_GIPHY_API_KEY || 'dc6zaTOxFJmzC';
+    // If direct link (no state), we could fetch or just show discussion.
+    // For MVP, we assume navigation from Search or just show comments for this ID (url).
 
     useEffect(() => {
-        // Fetch GIF if not passed via state
-        if (!gif) {
-            const fetchGif = async () => {
-                try {
-                    const res = await axios.get(`https://api.giphy.com/v1/gifs/${mediaId}?api_key=${API_KEY}`);
-                    setGif(res.data.data);
-                } catch (err) {
-                    console.log(err);
-                }
-            }
-            fetchGif();
-        }
-
-        // Fetch Local Tweets about this GIF
+        // Fetch Local Tweets about this Article
         const fetchTweets = async () => {
             try {
-                const res = await api.get(`/tweets/media/${mediaId}`);
+                // mediaId is the encoded URL
+                const res = await api.get(`/tweets/media/${encodeURIComponent(mediaId)}`);
                 setTweets(res.data);
             } catch (err) {
                 console.log(err);
             }
         };
         fetchTweets();
-    }, [mediaId, gif]);
+    }, [mediaId]);
 
     const handlePost = async () => {
         try {
             const res = await api.post('/tweets', {
                 content,
-                mediaId: gif.id,
-                mediaUrl: gif.images.original.url // Save URL for display in feed
+                mediaId: mediaId, // Save encoded URL as ID
+                mediaUrl: article?.urlToImage // Save Image for display
             });
             setTweets([res.data, ...tweets]);
             setContent('');
@@ -55,31 +43,45 @@ const Details = () => {
         }
     };
 
-    if (!gif) return <div>Loading...</div>;
+    if (!article && !mediaId) return <div>Loading...</div>;
 
     return (
         <div style={{ padding: '20px' }}>
-            <h2>Media Discussion</h2>
-            <div style={{ marginBottom: '20px' }}>
-                <img src={gif.images?.original?.url} alt="" style={{ maxWidth: '100%', borderRadius: '15px' }} />
-                <h3>{gif.title}</h3>
-            </div>
+            <h2>Article Discussion</h2>
+            {article && (
+                <div style={{ marginBottom: '20px' }}>
+                    {article.urlToImage && <img src={article.urlToImage} alt="" style={{ maxWidth: '100%', borderRadius: '15px' }} />}
+                    <h3>{article.title}</h3>
+                    <p>{article.description}</p>
+                    <a href={article.url} target="_blank" rel="noreferrer" style={{ color: '#007bff' }}>Read Full Story at {article.source?.name}</a>
+                </div>
+            )}
+            {!article && <p style={{ color: 'gray', fontStyle: 'italic' }}>Article details not available (Deep link). View discussion below.</p>}
 
             <div style={{ border: '1px solid var(--border-color)', padding: '15px', borderRadius: '15px', marginBottom: '20px' }}>
-                <textarea
-                    className="form-input"
-                    placeholder="Share your thoughts on this GIF..."
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    style={{ border: 'none', resize: 'none' }}
-                />
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <button className="btn" onClick={handlePost}>Tweet with GIF</button>
-                </div>
+                {currentUser ? (
+                    <>
+                        <textarea
+                            className="form-input"
+                            placeholder="Share your thoughts on this article..."
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            style={{ border: 'none', resize: 'none' }}
+                        />
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <button className="btn" onClick={handlePost}>Post Comment</button>
+                        </div>
+                    </>
+                ) : (
+                    <div style={{ textAlign: 'center' }}>
+                        <p style={{ marginBottom: '10px' }}>Join the conversation</p>
+                        <Link to="/login" className="btn" style={{ textDecoration: 'none', display: 'inline-block' }}>Login to Comment</Link>
+                    </div>
+                )}
             </div>
 
             <h3>Conversation</h3>
-            {tweets.length === 0 ? <p>No tweets about this GIF yet.</p> : (
+            {tweets.length === 0 ? <p>No buzzes yet.</p> : (
                 tweets.map(tweet => (
                     <TweetCard key={tweet._id} tweet={tweet} setTweets={setTweets} />
                 ))
